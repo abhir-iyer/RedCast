@@ -3,8 +3,12 @@ from dash import dcc, html
 import pandas as pd
 import plotly.express as px
 
-# Load your dataset
-df = pd.read_csv("data/reddit_data.csv")
+# Load and merge datasets
+df_main = pd.read_csv("data/reddit_data.csv")
+df_sentiment = pd.read_csv("data/sentiment_data.csv")
+
+# Merge on 'title' to get sentiment columns
+df = pd.merge(df_main, df_sentiment[['title', 'sentiment', 'sentiment_score']], on='title', how='left')
 df['date'] = pd.to_datetime(df['date'])
 
 # Initialize the Dash app
@@ -25,7 +29,7 @@ volume_fig = px.bar(
     title='📈 Post Volume Over Time'
 )
 
-# Visualization 3: Score vs. Number of Comments
+# Visualization 3: Score vs Number of Comments by Sentiment
 scatter_fig = px.scatter(
     df, x='score', y='num_comments',
     color='sentiment',
@@ -67,7 +71,7 @@ app.layout = html.Div([
             dcc.Graph(figure=viral_dist_fig)
         ]),
     ]),
-    html.Div(id="back-to-top-anchor")  # Optional back-to-top anchor
+    html.Div(id="back-to-top-anchor")  # For back-to-top button
 ])
 
 if __name__ == '__main__':
