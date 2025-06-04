@@ -3,43 +3,44 @@ from dash import dcc, html
 import pandas as pd
 import plotly.express as px
 
-# Load datasets
+# Load the main Reddit dataset
 df_main = pd.read_csv("data/reddit_data.csv")
-df_sentiment = pd.read_csv("data/sentiment_data.csv")
-
-# Convert dates
 df_main['date'] = pd.to_datetime(df_main['date'])
 
-# Merge on 'title'
+# Load sentiment dataset
+df_sentiment = pd.read_csv("data/sentiment_data.csv")
+
+# Merge on title to include sentiment columns
 df = pd.merge(df_main, df_sentiment, on='title', how='left')
 
-# Initialize Dash app
+# Initialize app
 app = dash.Dash(__name__)
 app.title = "RedCast - Reddit Virality Dashboard"
 
-# Visualization 1: Average Sentiment Over Time
+# Visualization 1: Sentiment over time
 sentiment_fig = px.line(
     df.groupby('date')['sentiment_score'].mean().reset_index(),
     x='date', y='sentiment_score',
     title='📉 Average Sentiment Over Time'
 )
 
-# Visualization 2: Post Volume Over Time
+# Visualization 2: Post volume
 volume_fig = px.bar(
     df.groupby('date').size().reset_index(name='count'),
     x='date', y='count',
     title='📈 Post Volume Over Time'
 )
 
-# Visualization 3: Score vs Number of Comments Colored by Sentiment Score
+# Visualization 3: Score vs Comments colored by sentiment score
 scatter_fig = px.scatter(
-    df, x='score', y='num_comments',
+    df.dropna(subset=['sentiment_score']),
+    x='score', y='num_comments',
     color='sentiment_score',
     title='💬 Score vs Comments by Sentiment Score',
     hover_data=['title']
 )
 
-# Visualization 4: Sentiment Distribution
+# Visualization 4: Sentiment distribution
 sentiment_dist_fig = px.histogram(
     df.dropna(subset=['sentiment']),
     x='sentiment',
@@ -47,7 +48,7 @@ sentiment_dist_fig = px.histogram(
     color='sentiment'
 )
 
-# Visualization 5: Virality Distribution
+# Visualization 5: Virality distribution (if available)
 if 'viral' in df.columns:
     viral_dist_fig = px.histogram(
         df.dropna(subset=['viral']),
@@ -57,7 +58,7 @@ if 'viral' in df.columns:
     )
 else:
     viral_dist_fig = px.histogram(
-        title="No 'viral' column found"
+        title='🔥 Virality column missing'
     )
 
 # Layout
