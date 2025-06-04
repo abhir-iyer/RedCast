@@ -3,16 +3,15 @@ from dash import dcc, html
 import pandas as pd
 import plotly.express as px
 
-# Load main and sentiment datasets
+# Load datasets
 df_main = pd.read_csv("data/reddit_data.csv")
 df_sentiment = pd.read_csv("data/sentiment_data.csv")
 
-# Ensure date columns are datetime
+# Convert dates
 df_main['date'] = pd.to_datetime(df_main['date'])
-df_sentiment['date'] = pd.to_datetime(df_sentiment['date'])
 
-# Merge on date
-df = pd.merge(df_main, df_sentiment, on='date', how='left')
+# Merge on 'title'
+df = pd.merge(df_main, df_sentiment, on='title', how='left')
 
 # Initialize Dash app
 app = dash.Dash(__name__)
@@ -36,11 +35,11 @@ volume_fig = px.bar(
 scatter_fig = px.scatter(
     df, x='score', y='num_comments',
     color='sentiment_score',
-    title='💬 Score vs Number of Comments by Sentiment Score',
+    title='💬 Score vs Comments by Sentiment Score',
     hover_data=['title']
 )
 
-# Visualization 4: Sentiment Distribution (if sentiment available)
+# Visualization 4: Sentiment Distribution
 sentiment_dist_fig = px.histogram(
     df.dropna(subset=['sentiment']),
     x='sentiment',
@@ -48,7 +47,7 @@ sentiment_dist_fig = px.histogram(
     color='sentiment'
 )
 
-# Visualization 5: Virality Analysis (if viral column exists)
+# Visualization 5: Virality Distribution
 if 'viral' in df.columns:
     viral_dist_fig = px.histogram(
         df.dropna(subset=['viral']),
@@ -61,7 +60,7 @@ else:
         title="No 'viral' column found"
     )
 
-# Define layout
+# Layout
 app.layout = html.Div([
     html.H1("🧠 RedCast - Reddit Virality Dashboard", style={'textAlign': 'center'}),
     dcc.Tabs([
@@ -71,7 +70,7 @@ app.layout = html.Div([
         dcc.Tab(label='Sentiment Breakdown', children=[dcc.Graph(figure=sentiment_dist_fig)]),
         dcc.Tab(label='Virality Analysis', children=[dcc.Graph(figure=viral_dist_fig)])
     ]),
-    html.Div(id="back-to-top-anchor")  # For back-to-top button
+    html.Div(id="back-to-top-anchor")
 ])
 
 if __name__ == '__main__':
