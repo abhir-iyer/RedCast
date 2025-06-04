@@ -7,8 +7,8 @@ import plotly.express as px
 df_main = pd.read_csv("data/reddit_data.csv")
 df_sentiment = pd.read_csv("data/sentiment_data.csv")
 
-# Merge on 'title' to get sentiment columns
-df = pd.merge(df_main, df_sentiment[['title', 'sentiment', 'sentiment_score']], on='title', how='left')
+# Merge on 'date' only
+df = pd.merge(df_main, df_sentiment, on='date', how='left')
 df['date'] = pd.to_datetime(df['date'])
 
 # Initialize the Dash app
@@ -29,22 +29,21 @@ volume_fig = px.bar(
     title='📈 Post Volume Over Time'
 )
 
-# Visualization 3: Score vs Number of Comments by Sentiment
+# Visualization 3: Score vs Comments colored by sentiment score
 scatter_fig = px.scatter(
     df, x='score', y='num_comments',
-    color='sentiment',
-    hover_data=['title'],
+    color='sentiment_score',
     title='💬 Score vs Number of Comments by Sentiment'
 )
 
-# Visualization 4: Sentiment Distribution
+# Visualization 4: Sentiment category distribution
 sentiment_dist_fig = px.histogram(
     df, x='sentiment',
-    title='🎭 Sentiment Distribution',
+    title='🎭 Sentiment Category Distribution',
     color='sentiment'
 )
 
-# Visualization 5: Virality Breakdown
+# Visualization 5: Virality breakdown
 viral_dist_fig = px.histogram(
     df, x='viral',
     title='🔥 Virality Distribution',
@@ -55,23 +54,13 @@ viral_dist_fig = px.histogram(
 app.layout = html.Div([
     html.H1("🧠 RedCast - Reddit Virality Dashboard", style={'textAlign': 'center'}),
     dcc.Tabs([
-        dcc.Tab(label='Sentiment Over Time', children=[
-            dcc.Graph(figure=sentiment_fig)
-        ]),
-        dcc.Tab(label='Post Volume', children=[
-            dcc.Graph(figure=volume_fig)
-        ]),
-        dcc.Tab(label='Score vs Comments', children=[
-            dcc.Graph(figure=scatter_fig)
-        ]),
-        dcc.Tab(label='Sentiment Breakdown', children=[
-            dcc.Graph(figure=sentiment_dist_fig)
-        ]),
-        dcc.Tab(label='Virality Analysis', children=[
-            dcc.Graph(figure=viral_dist_fig)
-        ]),
+        dcc.Tab(label='Sentiment Over Time', children=[dcc.Graph(figure=sentiment_fig)]),
+        dcc.Tab(label='Post Volume', children=[dcc.Graph(figure=volume_fig)]),
+        dcc.Tab(label='Score vs Comments', children=[dcc.Graph(figure=scatter_fig)]),
+        dcc.Tab(label='Sentiment Breakdown', children=[dcc.Graph(figure=sentiment_dist_fig)]),
+        dcc.Tab(label='Virality Analysis', children=[dcc.Graph(figure=viral_dist_fig)])
     ]),
-    html.Div(id="back-to-top-anchor")  # For back-to-top button
+    html.Div(id="back-to-top-anchor")
 ])
 
 if __name__ == '__main__':
