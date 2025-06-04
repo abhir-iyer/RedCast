@@ -8,7 +8,8 @@ df_main = pd.read_csv("data/reddit_data.csv")
 df_sentiment = pd.read_csv("data/sentiment_data.csv")
 
 # Merge on 'title' to get sentiment columns
-df = pd.merge(df_main, df_sentiment[['title', 'sentiment', 'sentiment_score']], on='title', how='left')
+# Only merge on 'date' with sentiment_score
+df = pd.merge(df_main, df_sentiment, on='date', how='left')
 df['date'] = pd.to_datetime(df['date'])
 
 # Initialize the Dash app
@@ -30,12 +31,10 @@ volume_fig = px.bar(
 )
 
 # Visualization 3: Score vs Number of Comments by Sentiment
-scatter_fig = px.scatter(
-    df, x='score', y='num_comments',
-    color='sentiment',
-    hover_data=['title'],
-    title='💬 Score vs Number of Comments by Sentiment'
-)
+# If using color in a scatter plot
+scatter_fig = px.scatter(df, x='score', y='num_comments',
+                         color='sentiment_score',  # instead of 'sentiment'
+                         title='💬 Score vs Number of Comments by Sentiment')
 
 # Visualization 4: Sentiment Distribution
 sentiment_dist_fig = px.histogram(
