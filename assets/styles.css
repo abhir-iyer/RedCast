@@ -34,7 +34,7 @@ div.js-plotly-plot {
     margin-bottom: 2rem;
 }
 
-/* Tabs */
+/* Tabs Layout */
 .dash-tabs {
     margin: 0 2rem;
 }
@@ -74,4 +74,14 @@ div.js-plotly-plot {
 
 #backToTopBtn:hover {
     background-color: #007f86;
+}
+
+/* Footer */
+footer {
+    text-align: center;
+    padding: 1rem;
+    margin-top: 2rem;
+    font-size: 14px;
+    color: #aaa;
+    border-top: 1px solid #eee;
 }
