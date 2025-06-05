@@ -78,7 +78,15 @@ app.layout = html.Div([
         dcc.Tab(label='Sentiment Breakdown', children=[
             dcc.Graph(figure=sentiment_dist_fig) if isinstance(sentiment_dist_fig, Figure) else html.Div("No data to display")
         ]),
-    ])
+    ]),
+    html.Footer("Built by Abhir Iyer", style={
+        'textAlign': 'center',
+        'padding': '1rem',
+        'marginTop': '2rem',
+        'fontSize': '14px',
+        'color': '#aaa',
+        'borderTop': '1px solid #eee'
+    })
 ])
 
 if __name__ == '__main__':
