@@ -7,10 +7,12 @@ import plotly.express as px
 df_main = pd.read_csv("data/reddit_data.csv")
 df_sentiment = pd.read_csv("data/sentiment_data.csv")
 
-# Merge on 'title'
-df = pd.merge(df_main, df_sentiment[['title', 'sentiment', 'sentiment_score']], on='title', how='left')
+# Remove existing sentiment_score column to prevent merge conflict
+if 'sentiment_score' in df_main.columns:
+    df_main = df_main.drop(columns=['sentiment_score'])
 
-# Convert 'date' to datetime
+# Merge safely
+df = pd.merge(df_main, df_sentiment[['title', 'sentiment', 'sentiment_score']], on='title', how='left')
 df['date'] = pd.to_datetime(df['date'])
 
 # === Visualization 1: Sentiment over time ===
