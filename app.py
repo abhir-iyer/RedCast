@@ -59,21 +59,6 @@ try:
 except Exception:
     sentiment_dist_fig = "No data available"
 
-# --- Visualization 5: Virality Distribution (if available) ---
-try:
-    if 'viral' in df.columns and df['viral'].notna().any():
-        viral_dist_fig = px.histogram(
-            df.dropna(subset=['viral']), x='viral',
-            color='viral',
-            title='🔥 Virality Distribution'
-        )
-    else:
-        raise ValueError("No 'viral' data found")
-except Exception:
-    viral_dist_fig = px.histogram(
-        x=[], title="🔥 Virality Distribution (No Data)"
-    )
-
 # Layout
 app = dash.Dash(__name__)
 app.title = "RedCast - Reddit Virality Dashboard"
@@ -92,9 +77,6 @@ app.layout = html.Div([
         ]),
         dcc.Tab(label='Sentiment Breakdown', children=[
             dcc.Graph(figure=sentiment_dist_fig) if isinstance(sentiment_dist_fig, Figure) else html.Div("No data to display")
-        ]),
-        dcc.Tab(label='Virality Analysis', children=[
-            dcc.Graph(figure=viral_dist_fig) if isinstance(viral_dist_fig, Figure) else html.Div("No data to display")
         ]),
     ])
 ])
